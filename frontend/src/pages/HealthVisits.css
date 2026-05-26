@@ -1,0 +1,59 @@
+@import './Common.css';
+
+.visit-form {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.visits-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+}
+
+.visits-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.visit-item {
+  background: #f5f9fc;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  border-left: 4px solid #0c5394;
+}
+
+.visit-header {
+  margin-bottom: 1rem;
+}
+
+.visit-doctor {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #0c5394;
+}
+
+.visit-date {
+  display: block;
+  font-size: 0.875rem;
+  color: #666;
+  margin-top: 0.25rem;
+}
+
+.visit-diagnosis,
+.visit-notes {
+  margin: 0.5rem 0 0 0;
+  color: #333;
+}
+
+.file-selected {
+  color: #1e7e34;
+  font-weight: 600;
+  margin-top: 0.5rem;
+}

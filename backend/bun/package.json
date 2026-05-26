@@ -1,0 +1,28 @@
+{
+  "name": "health-api-bun",
+  "version": "1.0.0",
+  "description": "Health diary API backend using Bun + Elysia",
+  "module": "index.ts",
+  "type": "module",
+  "scripts": {
+    "start": "bun run index.ts",
+    "dev": "bun run --watch index.ts",
+    "build": "bun build index.ts --outfile dist/index.js"
+  },
+  "keywords": [
+    "health",
+    "api",
+    "elysia",
+    "bun",
+    "pwa"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "elysia": "latest",
+    "@elysiajs/cors": "latest"
+  },
+  "devDependencies": {
+    "bun-types": "latest"
+  }
+}

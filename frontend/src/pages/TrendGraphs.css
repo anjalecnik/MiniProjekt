@@ -1,0 +1,47 @@
+@import './Common.css';
+
+.graph-section {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  display: flex;
+  justify-content: center;
+}
+
+.trend-canvas {
+  max-width: 100%;
+  height: auto;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.graph-info {
+  background: white;
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.graph-info p {
+  margin: 0;
+  font-size: 0.95rem;
+}
+
+.graph-info strong {
+  color: #0c5394;
+  font-weight: 700;
+}
+
+@media (max-width: 768px) {
+  .graph-section {
+    padding: 1rem;
+  }
+
+  .trend-canvas {
+    width: 100%;
+  }
+}

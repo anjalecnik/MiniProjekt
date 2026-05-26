@@ -1,0 +1,68 @@
+{
+  "name": "Osebni zdravstveni dnevnik",
+  "short_name": "Zdravstveni dnevnik",
+  "description": "Progressive Web App za upravljanje osebnega zdravstvenega dnevnika s poudarkom na dostopnosti",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#1e7e34",
+  "orientation": "portrait-primary",
+  "scope": "/",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-maskable.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    }
+  ],
+  "categories": ["health", "medical"],
+  "screenshots": [
+    {
+      "src": "/screenshot1.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    },
+    {
+      "src": "/screenshot2.png",
+      "sizes": "540x720",
+      "type": "image/png"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Dnevnik simptomov",
+      "short_name": "Simptomi",
+      "url": "/?page=diary",
+      "icons": [
+        {
+          "src": "/shortcut-diary.png",
+          "sizes": "96x96"
+        }
+      ]
+    },
+    {
+      "name": "Seznam zdravil",
+      "short_name": "Zdravila",
+      "url": "/?page=medications",
+      "icons": [
+        {
+          "src": "/shortcut-meds.png",
+          "sizes": "96x96"
+        }
+      ]
+    }
+  ]
+}
