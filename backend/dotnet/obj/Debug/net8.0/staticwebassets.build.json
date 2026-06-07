@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "pkCeZX7SjJSUsR+d5buYiIcwY1ffauu+Rnwv0BlN2FM=",
+  "Source": "HealthApi",
+  "BasePath": "_content/HealthApi",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}

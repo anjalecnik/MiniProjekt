@@ -6,6 +6,9 @@ node_modules/
 # Testing
 coverage/
 .nyc_output/
+frontend/test-results/
+frontend/playwright-report/
+tests/k6-report-*.json
 
 # Production
 dist/

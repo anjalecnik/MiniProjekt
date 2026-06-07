@@ -5,10 +5,11 @@ services:
     ports:
       - "5173:5173"
     depends_on:
-      backend:
+      backend-nodejs:
         condition: service_healthy
 
-  backend:
+  # ── Node.js + Fastify (privzeti backend) ─────────────────────────────────
+  backend-nodejs:
     build:
       context: ./backend/nodejs
     environment:
@@ -20,7 +21,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - backend-data:/data
+      - nodejs-data:/data
     healthcheck:
       test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r => process.exit(r.ok ? 0 : 1)).catch(() => process.exit(1))"]
       interval: 5s
@@ -28,5 +29,46 @@ services:
       retries: 10
       start_period: 5s
 
+  # ── .NET 8 + ASP.NET Core Minimal API ────────────────────────────────────
+  backend-dotnet:
+    build:
+      context: ./backend/dotnet
+    environment:
+      DATABASE_URL: /data/health.db
+    ports:
+      - "3001:3000"
+    volumes:
+      - dotnet-data:/data
+    profiles:
+      - dotnet
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 15s
+
+  # ── Ruby 3 + Sinatra + Puma ───────────────────────────────────────────────
+  backend-ruby:
+    build:
+      context: ./backend/ruby
+    environment:
+      DATABASE_URL: /data/health.db
+      RACK_ENV: production
+    ports:
+      - "3002:3000"
+    volumes:
+      - ruby-data:/data
+    profiles:
+      - ruby
+    healthcheck:
+      test: ["CMD-SHELL", "curl -f http://localhost:3000/health || exit 1"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+      start_period: 10s
+
 volumes:
-  backend-data:
+  nodejs-data:
+  dotnet-data:
+  ruby-data:

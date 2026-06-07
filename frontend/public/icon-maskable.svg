@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192" width="192" height="192">
+  <!-- maskable: safe zone is center 80% (19px safe margin each side) -->
+  <rect width="192" height="192" fill="#1e7e34"/>
+  <rect x="88" y="54" width="16" height="84" rx="6" fill="white"/>
+  <rect x="54" y="88" width="84" height="16" rx="6" fill="white"/>
+</svg>

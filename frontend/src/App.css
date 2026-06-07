@@ -20,9 +20,102 @@
 
 [data-high-contrast] {
   --primary-color: #000000;
-  --text: #000000;
+  --primary-dark: #000000;
+  --secondary-color: #000000;
+  --accent-color: #000000;
   --background: #ffffff;
+  --text: #000000;
   --border: #000000;
+}
+
+[data-high-contrast] .btn-primary,
+[data-high-contrast] .btn-secondary,
+[data-high-contrast] .btn-voice,
+[data-high-contrast] .btn-stop,
+[data-high-contrast] .toggle-button.enabled,
+[data-high-contrast] .toggle-button[aria-pressed='true'] {
+  background-color: #000000;
+  color: #ffffff;
+  border: 2px solid #ffffff;
+}
+
+[data-high-contrast] .toggle-button {
+  background-color: #ffffff;
+  color: #000000;
+  border: 2px solid #000000;
+}
+
+[data-high-contrast] .size-btn.active {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #000000;
+}
+
+[data-high-contrast] .app-header {
+  background-color: #000000;
+  color: #ffffff;
+}
+
+[data-high-contrast] .app-header .app-title {
+  color: #ffffff;
+}
+
+[data-high-contrast] .app-navigation {
+  background-color: #000000;
+}
+
+[data-high-contrast] .nav-button {
+  background-color: #000000;
+  color: #ffffff;
+  border-color: #ffffff;
+}
+
+[data-high-contrast] .nav-button.active {
+  background-color: #ffffff;
+  color: #000000;
+  border-color: #000000;
+}
+
+[data-high-contrast] .setting-label,
+[data-high-contrast] .form-label,
+[data-high-contrast] .help-text {
+  color: #000000;
+}
+
+[data-high-contrast] .page {
+  background: #ffffff;
+  border: 2px solid #000000;
+}
+
+[data-high-contrast] .page h2,
+[data-high-contrast] .page h3 {
+  color: #000000;
+}
+
+[data-high-contrast] input,
+[data-high-contrast] select,
+[data-high-contrast] textarea {
+  border-color: #000000;
+  border-width: 2px;
+}
+
+.skip-link {
+  position: absolute;
+  top: -100%;
+  left: 0;
+  z-index: 9999;
+  padding: 0.75rem 1.5rem;
+  background-color: #000000;
+  color: #ffffff;
+  font-weight: 700;
+  text-decoration: none;
+  border-radius: 0 0 4px 0;
+}
+
+.skip-link:focus {
+  top: 0;
+  outline: 3px solid #ff9800;
+  outline-offset: 2px;
 }
 
 * {
@@ -51,7 +144,7 @@ body {
   min-height: 100vh;
   max-width: 1200px;
   margin: 0 auto;
-  padding: 1rem;
+  padding: 0 1rem 1rem;
 }
 
 *:focus {
@@ -104,12 +197,12 @@ button {
 }
 
 .btn-voice {
-  background-color: #4285f4;
+  background-color: #1a56db;  /* #4285f4 ne zadosti 4.5:1 z belo; #1a56db = 6.2:1 */
   color: white;
 }
 
 .btn-voice:hover {
-  background-color: #357ae8;
+  background-color: #1446b8;
 }
 
 .btn-stop {
@@ -138,6 +231,18 @@ textarea {
   min-height: 120px;
   resize: vertical;
   font-family: inherit;
+}
+
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 @media (prefers-reduced-motion: reduce) {

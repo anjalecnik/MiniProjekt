@@ -1,87 +1,37 @@
-# Osebni zdravstveni dnevnik - PWA
+# Osebni zdravstveni dnevnik — PWA
 
-Progressive Web App za upravljanje osebnega zdravstvenega dnevnika z dostopnostjo (WCAG 2.2 AA) v ospredju.
+Progressive Web App za upravljanje osebnega zdravstvenega dnevnika s poudarkom na dostopnosti (WCAG 2.2 AA).
 
-## Arhitektura
+## Ideja in ciljna skupina
 
-### Frontend
+Aplikacija je namenjena **bolnikom s kroničnimi boleznimi in njihovim skrbnikom**, ki potrebujejo enostavno orodje za:
+- dnevno beleženje simptomov (vključno z glasovnim vnosom)
+- upravljanje zdravil in opomnikov
+- vodenje zgodovine zdravniških obiskov z možnostjo nalaganja PDF dokumentov
+- vizualizacijo trendov simptomov v obliki grafov
 
-- **Framework**: React + Vite
-- **Storage**: IndexedDB + localStorage
-- **APIs**: Web Speech (glasovni vnos), File (PDF), Vibration, Clipboard, Canvas
+Ključna prednost je **dostopnost** — aplikacija je zasnovana za uporabnike z motoričnimi, vidnimi ali kognitivnimi ovirami.
 
-### PWA
+---
 
-- **Manifest**: Web App Manifest za installacijo
-- **Service Worker**: 4 strategije cachiranja
-  - Cache First: statični viri (HTML, CSS, JS)
-  - Network First: zdravstveni podatki
-  - Stale-While-Revalidate: grafi
-  - Network Only: PDF izvoz
-- **Offline**: Fallback za zadnje shranjene vnose
-- **Background Sync**: Sinhronizacija brez interneta
-- **Push Notifications**: Opomniki za zdravila
-- **Periodic Sync**: Dnevni opomniki
-
-### Backend (3 implementacije)
-
-Vsi z SQLite bazo, enakimi endpointi:
-
-1. **Node.js + Fastify** (`backend/nodejs`)
-   - Hiter, lahek server
-   - Primerno za produkcijo
-   - Zahteva Node.js >= 16
-
-2. **Deno + Hono** (`backend/deno`)
-   - Privzeto varna izvedba
-   - Sodobna arhitektura
-   - Zahteva Deno runtime
-
-3. **Bun + Elysia** (`backend/bun`)
-   - Najhitrejša izvedba
-   - Integrirane SQLite
-   - Zahteva Bun runtime
-
-## Namestitev
+## Navodila za zagon
 
 ### Predpogoji
 
-- Node.js >= 16 (za frontend)
-- npm ali yarn
+- Node.js >= 18
+- .NET 8 SDK (za .NET backend)
+- Ruby 3.3 + Bundler (za Ruby backend)
+- k6 (za performance teste, opcijsko)
 
-### Zagon celotne aplikacije z Dockerjem
-
-Za zagon frontenda in Node.js backenda brez lokalne namestitve odvisnosti potrebujete Docker Desktop oziroma Docker Engine z Docker Compose.
-
-V korenski mapi projekta zaženite:
+### 1. Backend — Node.js (privzeto, port 3000)
 
 ```bash
-docker compose up --build
+cd backend/nodejs
+npm install
+npm start
 ```
 
-Po zagonu sta dostopna:
-
-- Frontend: `http://localhost:5173`
-- Backend API: `http://localhost:3000`
-- Health check: `http://localhost:3000/health`
-
-SQLite podatki backenda se shranijo v Docker volume `backend-data`, zato ostanejo ohranjeni tudi po ustavitvi containerjev.
-
-Za ustavitev aplikacije uporabite:
-
-```bash
-docker compose down
-```
-
-Za ustavitev in izbris shranjenih podatkov uporabite:
-
-```bash
-docker compose down -v
-```
-
-Push obvestila niso potrebna za osnovni zagon. Če jih želite uporabljati, kopirajte `.env.example` v `.env`, vnesite veljavne VAPID ključe in ponovno zaženite `docker compose up --build`.
-
-### Setup Frontend
+### 2. Frontend (port 5173)
 
 ```bash
 cd frontend
@@ -89,206 +39,235 @@ npm install
 npm run dev
 ```
 
-Dostopen na: `http://localhost:5173`
+### 3. Alternativni backendi
 
-### Setup Node.js Backend
+```bash
+# .NET 8 — port 3001
+cd backend/dotnet
+dotnet run --urls http://localhost:3001
+
+# Ruby — port 3002
+cd backend/ruby
+bundle install
+bundle exec puma -p 3002 config.ru
+```
+
+### 4. Docker (Node.js + frontend skupaj)
+
+```bash
+cp .env.example .env    # nastavi VAPID ključe
+docker compose up --build
+# Frontend: http://localhost:5173
+# API:      http://localhost:3000
+```
+
+### 5. Push obvestila — VAPID ključi
 
 ```bash
 cd backend/nodejs
-npm install
-node index.js
+npx web-push generate-vapid-keys
+# Kopiraj ključe v backend/nodejs/.env in frontend/.env
 ```
 
-Dostopen na: `http://localhost:3000`
+---
 
-### Setup Deno Backend
+## PWA zmožnosti
 
-```bash
-cd backend/deno
-deno run --allow-net --allow-read --allow-write main.ts
-```
+### Web App Manifest
 
-### Setup Bun Backend
+Veljavna konfiguracija z SVG ikonami (any + maskable), imenom, kratkim imenom, `display: standalone`, orientacijo in bližnjicami:
+- Bližnjica »Dnevnik simptomov« → `/?page=diary`
+- Bližnjica »Seznam zdravil« → `/?page=medications`
 
-```bash
-cd backend/bun
-bun install
-bun index.ts
-```
+### Service Worker (`/public/sw.js`)
 
-## API Endpointi
+Service Worker ima aktivno vlogo — prestreza vse zahteve in odloča med omrežjem in predpomnilnikom:
 
-### Simptomi
+| Vrsta vira | Strategija | Razlog |
+|-----------|------------|--------|
+| CSS, JS, SVG, ikone | **Cache First** | Statični viri; hitrejši zagon brez omrežja |
+| `/vnosi`, `/zdravila` | **Network First** | Zdravstveni podatki morajo biti sveži; predpomnilnik kot varnostna mreža |
+| `/grafi` | **Stale-While-Revalidate** | Hitrejši prikaz, posodobitev v ozadju |
+| `/izvoz-pdf` | **Network Only** | Izvoz mora biti vedno svež |
 
-- `POST /vnos` - Dodaj simptom
-- `GET /vnosi` - Pridobi simptome (zadnjih 30)
+### Napredne zmožnosti
 
-### Zdravila
-
-- `GET /zdravila` - Pridobi aktivna zdravila
-- `POST /zdravila` - Dodaj zdravilo
-
-### Zdravniški obiski
-
-- `GET /obiski` - Pridobi obiski
-- `POST /obiski` - Dodaj obisk
-
-### Push Notifications
-
-- `POST /push/subscribe` - Prijava za obvestila
-- `POST /push/send` - Pošlji obvestilo
-
-### Ostali
-
-- `POST /sync` - Background sync
-- `GET /izvoz-pdf` - Izvez povzetka
-- `GET /health` - Status preverjanja
-
-## Dostopnost (WCAG 2.2 AA)
-
-✅ Semantični HTML (main, nav, section, article)
-✅ ARIA oznake in vloge (aria-label, aria-live, role="alert")
-✅ Vidni fokus (outline 3px)
-✅ Tab vrstni red
-✅ Kontrast 4.5:1 (AAA za besedilo)
-✅ Velika pisava (3 velikosti: S, M, L)
-✅ Visok kontrast način
-✅ Glasovni vnos (Web Speech API)
-✅ Haptični odzivi (Vibration API)
-
-## Testiranje
-
-### Accessibility
-
-```bash
-npm test -- accessibility.test.js
-```
-
-### API
-
-```bash
-npm test -- api.test.js
-```
-
-### Manual Testing
-
-- NVDA (Windows) - bralna naprava
-- VoiceOver (Mac/iOS)
-- Lighthouse (Chrome DevTools)
-- axe DevTools (browser extension)
-
-## Zmogljivost
-
-Primerjava 3 backend implementacij:
-
-```bash
-# Namestite k6
-npm install -g k6
-
-# Zaženite test
-k6 run tests/performance.k6.js
-```
-
-## Struktura Projekta
-
-```
-MiniProjekt/
-├── frontend/                  # React + Vite
-│   ├── src/
-│   │   ├── components/       # UI komponente
-│   │   ├── pages/            # Strani
-│   │   ├── context/          # Context provideri
-│   │   ├── services/         # API klici
-│   │   └── utils/            # Utility funkcije
-│   └── public/
-│       ├── manifest.json     # PWA manifest
-│       └── sw.js             # Service Worker
-│
-├── backend/
-│   ├── nodejs/               # Fastify + SQLite
-│   ├── deno/                 # Hono + SQLite
-│   └── bun/                  # Elysia + SQLite
-│
-└── tests/                    # Testna suitaa
-    ├── accessibility.test.js
-    └── api.test.js
-```
-
-## Funkcionalnosti
-
-### Dnevnik simptomov
-
-- Tipkanje ali glasovni vnos (Web Speech API)
-- Avtomatski videk vnos
-- Grafi trendov (Canvas API)
-- Izvoz povzetka
-
-### Seznam zdravil
-
-- Dodaj zdravilo z odmerkom in pogostostjo
-- Opomniki za jemanje
-- Haptični signali (Vibration API)
-
-### Zdravniški obiski
-
-- Vnos obiska z diagnozo
-- Nalaganje PDF dokumentov
-- Prenos dokumentov
-
-### Multi-profil
-
-- Pacient ↔ Negovalec
-- Podatki se deljijo med profili
+- **Background Sync** — simptomi, vneseni brez povezave, se sinhronizirajo z backendom, ko se omrežje obnovi (`sync-health-data`)
+- **Push Notifications** — backend pošilja push obvestila prek VAPID; frontend se naroči v nastavitvah
+- **Periodic Background Sync** — dnevni opomnik za vnos simptomov (`daily-health-reminder`)
 
 ### Offline delovanje
 
-- Zadnji vnosi dostopni brez interneta
-- Avtomatska sinhronizacija ob vrnitvi na splet
-- Background Sync API
+Aplikacija deluje brez interneta:
+- IndexedDB hrani vse podatke lokalno
+- Service Worker vrne predpomnjene odzive
+- Ob vrnitvi na splet Background Sync pošlje čakajoče podatke
+
+---
+
+## Sodobni spletni API-ji
+
+| API | Kje | Opis |
+|-----|-----|------|
+| **Web Speech API** | `SymptomDiary.jsx` | Glasovni vnos simptomov v slovenščini (`sl-SI`) |
+| **Canvas API** | `TrendGraphs.jsx` | Črtni graf simptomov za zadnjih 30 dni |
+| **IndexedDB API** | `DBContext.jsx` | Lokalna baza (simptomi, zdravila, obiski, sync queue) |
+| **Vibration API** | `SymptomDiary.jsx` | Haptični odziv ob uspešnem shranjevanju |
+| **File API** | `HealthVisits.jsx` | Nalaganje in prenos PDF dokumentov (izvidi, napotnice) |
+| **Clipboard API** | `Settings.jsx` | Kopiranje povzetka dnevnika v odložišče |
+
+---
+
+## Strežniški del in primerjava okolij
+
+Tri enakovredne implementacije z istim REST API-jem in SQLite bazo:
+
+| Backend | Ogrodje | Port | Zagon |
+|---------|---------|------|-------|
+| **Node.js** | Fastify 5 + better-sqlite3 | 3000 | `npm start` |
+| **.NET 8** | ASP.NET Core Minimal API + Microsoft.Data.Sqlite | 3001 | `dotnet run --urls http://localhost:3001` |
+| **Ruby 3.3** | Sinatra 4 + Puma 6 | 3002 | `bundle exec puma -p 3002 config.ru` |
+
+### Primerjava razvoja
+
+| Kriterij | Node.js | .NET | Ruby |
+|----------|---------|------|------|
+| Hitrost zagona | ~0.5s | ~3s (JIT) | ~1s |
+| Struktura kode | Funkcionalna | Funkcionalna (Minimal API) | DSL (route bloki) |
+| Type safety | ❌ | ✅ C# | ❌ |
+| Zahtevnost namestitve | npm install | dotnet restore | bundle install |
+
+### REST API endpointi
+
+| Metoda | Pot | Opis |
+|--------|-----|------|
+| GET | `/health` | Health check |
+| POST | `/vnos` | Dodaj simptom |
+| GET | `/vnosi` | Simptomi (zadnjih 30) |
+| POST | `/zdravila` | Dodaj zdravilo |
+| GET | `/zdravila` | Aktivna zdravila |
+| POST | `/objekti` | Dodaj zdravniški obisk |
+| GET | `/objekti` | Seznam obiskov |
+| POST | `/push/subscribe` | Naroči se na push obvestila |
+| POST | `/sync` | Background sync |
+| GET | `/izvoz-pdf` | Izvoz povzetka kot text |
+
+---
+
+## Testiranje
+
+### Accessibility testi — Playwright + axe-core
+
+```bash
+cd frontend
+npm run test:a11y           # zaženi teste
+npm run test:a11y:report    # HTML poročilo v playwright-report/
+```
+
+**Rezultat: 14/14 testov uspešnih**
+
+Pokriva: WCAG kršitve (vseh 5 strani), skip link, tipkovnična navigacija, live region, aria-current, canvas opis, visok kontrast, mobilni prikaz.
+
+### API testi — Jest
+
+```bash
+cd backend/nodejs
+npm start          # backend mora teči
+npm test           # v ločenem terminalu
+```
+
+Pokriva vse endpointe: health, simptomi, zdravila, obiski, sync, izvoz.
+
+### Performance testi — k6
+
+```bash
+# Vsak backend na svojem portu
+k6 run tests/k6-performance.js                                       # Node.js
+k6 run --env API_URL=http://localhost:3001 tests/k6-performance.js   # .NET
+k6 run --env API_URL=http://localhost:3002 tests/k6-performance.js   # Ruby
+```
+
+**Rezultati** (smoke + load + stress, 50 VU):
+
+| Backend | req/s | p95 | Napake |
+|---------|------:|----:|--------|
+| Node.js | 138 | 19ms | 0% ✅ |
+| .NET | 125 | 160ms | 0% ✅ |
+| Ruby | 42 | 277ms | 0% ✅ |
+
+Podrobnosti: [`tests/k6-comparison.md`](tests/k6-comparison.md)
+
+---
+
+## Poročilo o dostopnosti (WCAG 2.2 AA)
+
+Preverjeno z axe-core 4.11 prek Playwright. **14/14 testov zelenih.**
+
+| Zahteva | Status | Opomba |
+|---------|--------|--------|
+| Semantični HTML | ✅ | `<header>`, `<nav>`, `<main>`, `<section>`, `<time>` |
+| Hierarhija naslovov | ✅ | H1 → H2 → H3 na vseh straneh |
+| Skip link | ✅ | »Preskoči na vsebino« — viden ob Tab fokusu |
+| Tipkovnična navigacija | ✅ | Vsi elementi dosegljivi; Enter/Space aktivira gumbe |
+| Vidni fokus | ✅ | `outline: 3px solid #0c5394` povsod |
+| Kontrast 4.5:1 | ✅ | Popravljeno: `btn-voice` (#1a56db=6.2:1), `empty-state` (#595959=6.7:1), `nav-label` |
+| ARIA labele | ✅ | `aria-label` na vseh gumbih, `aria-pressed` na toggleih |
+| Dostopni obrazci | ✅ | `<label for="...">`, `aria-describedby` za pomoč |
+| Live regioni | ✅ | Navigacijske objave + online/offline status |
+| Canvas dostopnost | ✅ | `role="img"` + `aria-label` + tabelarični prikaz pod grafom |
+| Zmanjšano gibanje | ✅ | `prefers-reduced-motion` — animacije izklopljene |
+| Visok kontrast | ✅ | Preklop v nastavitvah; vse barve #000/#fff |
+| Prilagoditev pisave | ✅ | 3 velikosti (S/M/L) v nastavitvah |
+| Podpora bralnikov zaslona | ✅ | Testirano z axe-core |
+
+---
+
+## Struktura projekta
+
+```
+MiniProjekt/
+├── frontend/                    # React 19 + Vite
+│   ├── public/
+│   │   ├── manifest.json        # Web App Manifest (SVG ikone, bližnjice)
+│   │   ├── sw.js                # Service Worker (4 strategije + Background Sync + Push)
+│   │   ├── icon.svg             # Główna ikona
+│   │   └── icon-maskable.svg    # Maskable ikona
+│   ├── src/
+│   │   ├── pages/               # SymptomDiary, MedicationList, HealthVisits, TrendGraphs, Settings
+│   │   ├── components/          # Header, Navigation
+│   │   └── context/             # DBContext (IndexedDB), ProfileContext
+│   └── tests/
+│       └── accessibility.spec.js  # 14 Playwright + axe-core testov
+├── backend/
+│   ├── nodejs/                  # Fastify 5 (port 3000) — privzeto
+│   │   └── tests/api.test.js
+│   ├── dotnet/                  # ASP.NET Core 8 Minimal API (port 3001)
+│   └── ruby/                    # Sinatra 4 + Puma (port 3002)
+├── tests/
+│   ├── k6-performance.js        # k6 obremenitveni testi
+│   ├── k6-comparison.md         # Rezultati primerjave
+│   └── k6-report-dotnet.json    # Podroben report
+└── compose.yaml                 # Docker Compose
+```
+
+---
 
 ## Okoljske spremenljivke
-
-Kopirajte `.env.example` v `.env` in izpolnite:
 
 ```bash
 cp .env.example .env
 ```
 
-Potrebni ključi:
+| Spremenljivka | Opis |
+|---------------|------|
+| `VAPID_PUBLIC_KEY` | Javni VAPID ključ za push obvestila |
+| `VAPID_PRIVATE_KEY` | Zasebni VAPID ključ |
+| `VAPID_SUBJECT` | E-poštni naslov pošiljatelja |
+| `DATABASE_URL` | Pot do SQLite baze (privzeto `./health.db`) |
+| `VITE_VAPID_PUBLIC_KEY` | Javni ključ za frontend |
+| `VITE_API_URL` | URL backenda (privzeto `http://localhost:3000`) |
 
-- `VAPID_PUBLIC_KEY` - Za push obvestila
-- `VAPID_PRIVATE_KEY` - Za push obvestila
-- `REACT_APP_API_URL` - URL backenda
-
-## Generiranje VAPID ključev
-
-```bash
-cd backend/nodejs
-npx web-push generate-vapid-keys
-```
-
-Kopirajte ključe v `.env` datoteko.
-
-## Build for Production
-
-### Frontend
-
-```bash
-cd frontend
-npm run build
-```
-
-### Backends
-
-Vsi 3 backendi so pripravljeni za produkcijo kot-je. Preprosto zaženite z:
-
-- Node.js: `node index.js`
-- Deno: `deno run -A main.ts`
-- Bun: `bun index.ts`
-
-## Prispevanje
-
-Projekt je namenjen študijskim namenom in primerjavi razvojnih platform.
+---
 
 ## Licenca
 

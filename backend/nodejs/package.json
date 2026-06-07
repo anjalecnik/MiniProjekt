@@ -7,7 +7,12 @@
   "scripts": {
     "start": "node index.js",
     "dev": "node --watch index.js",
-    "test": "jest --detectOpenHandles"
+    "test": "node --experimental-vm-modules node_modules/.bin/jest --detectOpenHandles --testPathPattern=tests/",
+    "test:perf": "k6 run ../../tests/k6-performance.js"
+  },
+  "jest": {
+    "testEnvironment": "node",
+    "transform": {}
   },
   "keywords": [
     "health",

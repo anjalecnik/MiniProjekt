@@ -44,7 +44,7 @@
 .empty-state {
   text-align: center;
   padding: 2rem;
-  color: #999;
+  color: #595959;  /* #999 = 2.84:1 na beli; #595959 = 6.65:1 */
   font-style: italic;
 }
 

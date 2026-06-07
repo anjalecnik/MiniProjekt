@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 96" width="96" height="96">
+  <rect width="96" height="96" rx="12" fill="#0c5394"/>
+  <!-- pill shape -->
+  <ellipse cx="48" cy="48" rx="28" ry="14" rx2="6" fill="white" transform="rotate(-30, 48, 48)"/>
+  <rect x="20" y="44" width="56" height="8" fill="#0c5394" transform="rotate(-30, 48, 48)"/>
+  <ellipse cx="48" cy="48" rx="28" ry="14" fill="none" stroke="white" stroke-width="4" transform="rotate(-30, 48, 48)"/>
+</svg>

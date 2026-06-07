@@ -7,15 +7,19 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test:a11y": "playwright test tests/accessibility.spec.js",
+    "test:a11y:report": "playwright test tests/accessibility.spec.js --reporter=html"
   },
   "dependencies": {
     "react": "^19.2.6",
     "react-dom": "^19.2.6"
   },
   "devDependencies": {
+    "@axe-core/playwright": "^4.11.3",
     "@babel/preset-react": "^7.29.7",
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
     "@testing-library/jest-dom": "^6.9.1",
     "@testing-library/react": "^16.3.2",
     "@types/react": "^19.2.14",

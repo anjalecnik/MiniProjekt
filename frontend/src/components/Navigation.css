@@ -18,6 +18,7 @@
   gap: 0.5rem;
   padding: 1rem;
   background: #f5f5f5;
+  color: #1a1a1a;  /* eksplicitna barva — prepreči podedovanje svetle barve iz index.css */
   border: 2px solid #ddd;
   border-radius: 8px;
   cursor: pointer;
